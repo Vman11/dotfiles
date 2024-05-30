@@ -36,7 +36,7 @@ Example Usage:
     # versions of CPython
     #source ~/local/tools/pyenv_ext/pyenv_ext_commands.sh
 
-    pyenv_create_virtualenv 3.11.2 most
+    pyenv_create_virtualenv 3.11.9 most
     pyenv_create_virtualenv 3.12.3 off
 "
 

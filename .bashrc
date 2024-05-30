@@ -117,20 +117,110 @@ if ! shopt -oq posix; then
 fi
 
 
-export PATH="$HOME/.pyenv/bin:$PATH"
-eval "$(pyenv init -)"
-eval "$(pyenv virtualenv-init -)"
+export PYENV_ROOT="$HOME/.pyenv"
+if [ -d "$PYENV_ROOT" ]; then
+    export PATH="$PYENV_ROOT/bin:$PATH"
+    eval "$("$PYENV_ROOT"/bin/pyenv init -)"
+    eval "$("$PYENV_ROOT"/bin/pyenv init --path)"
+    source "$PYENV_ROOT/completions/pyenv.bash"
+    export PYENV_PREFIX
+    PYENV_PREFIX=$(pyenv prefix)
+fi
 
 
 CHOSEN_PYTHON_VERSION=3.10.5
-# Set your shell to use this pyenv shim
-pyenv shell $CHOSEN_PYTHON_VERSION
+deactivate_venv()
+{
+    # https://stackoverflow.com/questions/85880/determine-if-a-function-exists-in-bash
+    if [ -n "$(type -t conda)" ] && [ "$(type -t conda)" = function ]; then
+        conda deactivate
+    fi
+    OLD_VENV=$VIRTUAL_ENV
+    echo "deactivate_venv OLD_VENV=$OLD_VENV"
+    if [ "$OLD_VENV" != "" ]; then
+        if [ -n "$(type -t deactivate)" ] && [ "$(type -t deactivate)" = function ]; then
+            # deactivate bash function exists
+            deactivate
+        fi
+    fi
+}
 
-# Use global instead of shell to ensure your prefered version is permanent
-# pyenv global $CHOSEN_PYTHON_VERSION
+workon_py()
+{
+    __doc__="
+    Switch virtual environments
+    "
+    local NEW_VENV=$1
+    echo "workon_py: NEW_VENV = $NEW_VENV"
 
-# Create the virtual environment
-python -m venv $(pyenv prefix)/envs/pyenv-geowatch
+    if [ ! -f "$NEW_VENV/bin/activate" ]; then
+        # Check if it is the name of a conda or virtual env
+        # First try conda, then virtualenv
+        local TEMP_PATH=$_CONDA_ROOT/envs/$NEW_VENV
+        #echo "TEMP_PATH = $TEMP_PATH"
+        if [ -d "$TEMP_PATH" ]; then
+            NEW_VENV=$TEMP_PATH
+        else
+            local TEMP_PATH=$HOME/$NEW_VENV
+            if [ -d "$TEMP_PATH" ]; then
+                local NEW_VENV=$TEMP_PATH
+            fi
+        fi
+    fi
+    # Try to find the environment the user requested
+    PYENV_ACTIVATE_CAND1=$(echo "$(pyenv root)"/versions/*/envs/"$NEW_VENV"/bin/activate)
 
-# Activate the virtual environment
-source $(pyenv prefix)/envs/pyenv-geowatch/bin/activate
+    if [ -f "$PYENV_ACTIVATE_CAND1" ]; then
+        deactivate_venv
+        source "$PYENV_ACTIVATE_CAND1"
+    elif [ -d "$NEW_VENV" ]; then
+        # Ensure the old env is deactivated
+        deactivate_venv
+        # shellcheck disable=SC1091
+        source "$NEW_VENV/bin/activate"
+    fi
+}
+
+
+
+_AUTOSTART_VENV=1
+if [[ "$_AUTOSTART_VENV" == "1" ]]; then
+    if [ "$DID_MY_BASHRC_INIT" == "" ]; then
+        # For some reason VIRTUAL_ENV is initialized as "", so unset it
+        unset VIRTUAL_ENV
+        #PYTHON_VERSION_PRIORITY=( "3.12.3" "3.11.2" "3.10.10" "3.10.5" "3.9.9" )
+        PYTHON_VENV_PRIORITY=( "3.11.9" "3.11.2" "3.10.10" "3.10.5" "3.9.9" )
+        #PYTHON_VERSION_PRIORITY=( "3.10.5" )
+        _found_env=0
+        for CHOSEN_PYTHON_VERSION in "${PYTHON_VERSION_PRIORITY[@]}"; do
+            if [ -d "$PYENV_ROOT/versions/$CHOSEN_PYTHON_VERSION/envs/pyenv$CHOSEN_PYTHON_VERSION" ]; then
+                _found_env=1
+                pyenv shell "$CHOSEN_PYTHON_VERSION"
+                source "$PYENV_ROOT/versions/$CHOSEN_PYTHON_VERSION/envs/pyenv$CHOSEN_PYTHON_VERSION/bin/activate" 
+                break
+            fi
+        done
+        if [[ "$_found_env" == "0" ]]; then
+            #echo $CHOSEN_PYTHON_VERSION
+            if [ -d "$HOME/.local/conda/envs/conda38" ]; then
+                conda activate conda38
+            elif [ -d "$HOME/.local/conda/envs/py38" ]; then
+                conda activate py38
+            elif [ -d "$HOME/.local/conda/envs/py37" ]; then
+                conda activate py37
+            elif [ -d "$HOME/.local/conda/envs/py36" ]; then
+                conda activate py36
+            fi 
+        fi
+
+    elif [ "$VIRTUAL_ENV" != "" ]; then
+        # On reload use the same venv you were in
+        #echo "WORKON VIRTUAL_ENV = $VIRTUAL_ENV"
+        workon_py "$VIRTUAL_ENV"
+    elif [ "$CONDA_PREFIX" != "" ]; then
+        # On reload use the same venv you were in
+        #echo "WORKON CONDA_PREFIX = $CONDA_PREFIX"
+        workon_py "$CONDA_PREFIX"
+    fi
+
+fi
