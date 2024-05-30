@@ -1,7 +1,7 @@
 # ~/.bashrc: executed by bash(1) for non-login shells.
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
-
+alias sbrc='source ~/.bashrc'
 # If not running interactively, don't do anything
 case $- in
     *i*) ;;
@@ -192,7 +192,7 @@ if [[ "$_AUTOSTART_VENV" == "1" ]]; then
         PYTHON_VENV_PRIORITY=( "3.11.9" "3.11.2" "3.10.10" "3.10.5" "3.9.9" )
         #PYTHON_VERSION_PRIORITY=( "3.10.5" )
         _found_env=0
-        for CHOSEN_PYTHON_VERSION in "${PYTHON_VERSION_PRIORITY[@]}"; do
+        for CHOSEN_PYTHON_VERSION in "${PYTHON_VENV_PRIORITY[@]}"; do
             if [ -d "$PYENV_ROOT/versions/$CHOSEN_PYTHON_VERSION/envs/pyenv$CHOSEN_PYTHON_VERSION" ]; then
                 _found_env=1
                 pyenv shell "$CHOSEN_PYTHON_VERSION"
