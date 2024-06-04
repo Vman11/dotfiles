@@ -4,6 +4,10 @@
 alias sbrc='source ~/.bashrc'
 alias ebrc='code ~/.bashrc'
 alias s='git status'
+export PATH=$HOME/.local/bin:$PATH
+export LD_LIBRARY_PATH=$HOME/.local/lib:$LD_LIBRARY_PATH
+export PKG_CONFIG_PATH=$HOME/.local/lib/pkgconfig:$PKG_CONFIG_PATH
+
 # If not running interactively, don't do anything
 case $- in
     *i*) ;;
