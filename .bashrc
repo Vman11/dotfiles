@@ -2,6 +2,8 @@
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
 alias sbrc='source ~/.bashrc'
+alias ebrc='code ~/.bashrc'
+alias s='git status'
 # If not running interactively, don't do anything
 case $- in
     *i*) ;;
