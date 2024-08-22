@@ -4,6 +4,7 @@
 #'
 sudo apt update && sudo apt upgrade
 sudo apt install terminator
+sudo apt install curl
 
 git config --global user.name "Vincenzo DiMatteo"
 git config --global user.email "47278634+Vman11@users.noreply.github.com"
