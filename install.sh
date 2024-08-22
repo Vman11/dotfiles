@@ -5,6 +5,7 @@
 sudo apt update && sudo apt upgrade
 sudo apt install terminator
 sudo apt install curl
+sudo apt install sl
 
 git config --global user.name "Vincenzo DiMatteo"
 git config --global user.email "47278634+Vman11@users.noreply.github.com"
@@ -18,6 +19,12 @@ source "$HOME"/.bashrc
 
 #curl https://pyenv.run | bash
 #curl -f https://zed.dev/install.sh | sh
+
+if ls $HOME/Downloads/code*.deb 1> /dev/null 2>&1; then
+    sudo apt install $HOME/Downloads/code*.deb
+else
+    echo "VSCODE not found in Downloads... ignoring..."
+fi
 
 echo "
 Next Steps:
