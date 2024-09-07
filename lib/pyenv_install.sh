@@ -62,7 +62,7 @@ apt_ensure(){
  # https://github.com/docker-library/python/issues/160#issuecomment-509426916
  # https://gist.github.com/nszceta/ec6efc9b5e54df70deeec7bceead0a1d
  # https://clearlinux.org/news-blogs/boosting-python-profile-guided-platform-specific-optimizations
- CHOSEN_PYTHON_VERSION=3.10.5
+ CHOSEN_PYTHON_VERSION=3.12.5
 
  PROFILE_TASK="-m test.regrtest --pgo test_array test_base64 test_binascii test_binhex test_binop test_c_locale_coercion test_csv test_json test_hashlib test_unicode test_codecs test_traceback test_decimal test_math test_compile test_threading test_time test_fstring test_re test_float test_class test_cmath test_complex test_iter test_struct test_slice test_set test_dict test_long test_bytes test_memoryview test_io test_pickle"
 
@@ -100,7 +100,7 @@ apt_ensure(){
  fi
 
  # Optionally auto-activate the chosen pyenv pyenv environment
- CHOSEN_PYTHON_VERSION=3.10.5
+ CHOSEN_PYTHON_VERSION=3.12.5
  if [ -d "$PYENV_PREFIX/envs/pyenv$CHOSEN_PYTHON_VERSION" ]; then
      source $PYENV_PREFIX/envs/pyenv$CHOSEN_PYTHON_VERSION/bin/activate
  fi
